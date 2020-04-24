@@ -26,19 +26,33 @@ This Terraform module will create below resources:
 ## Input Variables
 
 * **name** [string; required]: 
-  The name of your website/assets, e.g. `andi.xyz`, `aashari.id`, `mywebsite`, or  `andi-cms` 
+
+    The name of your website/assets, e.g. `andi.xyz`, `aashari.id`, `mywebsite`, or  `andi-cms`
+   
 * **is_versioning_enabled** [boolean; optional; default: false]: 
-  Toggle to enable or disable S3 bucket versioning
+  
+    Toggle to enable or disable S3 bucket versioning
+    
 * **domain_names** [list(string); optional; default: []]: 
-  The list of domain names associated to cloudfront, e.g. `["www.andi.xyz","andi.xyz"]`, or `["cms.andi.xyz"]`
+  
+    The list of domain names associated to cloudfront, e.g. `["www.andi.xyz","andi.xyz"]`, or `["cms.andi.xyz"]`
+    
 * **domain_vendor** [string; required if `domain_names` is filled]: 
-  The name of your DNS vendor, the choice: `cloudfront`
+  
+    The name of your DNS vendor, the choice: `cloudfront`
+    
 * **cloudflare_api_key** [string; required if `domain_vendor` are set to `cloudflare`]:
-  Cloudflare API key, you can get this from your Cloudflare account setting
+    
+    Cloudflare API key, you can get this from your Cloudflare account setting
+    
 * **cloudflare_email** [string; required if `domain_vendor` are set to `cloudflare`]:
-  Cloudflare Email, you can get this from your Cloudflare account setting
+    
+    Cloudflare Email, you can get this from your Cloudflare account setting
+    
 * **cloudflare_zone_id** [string; required if `domain_vendor` are set to `cloudflare`]:
-  Cloudflare zone id for `domain_names`, you can get this from zone setting
+    
+    Cloudflare zone id for `domain_names`, you can get this from zone setting
+    
 
 ## Output Variables
 
