@@ -106,7 +106,7 @@ module "website" {
 
 ```
 module "website" {
-    source  = "git@github.com:aashari/terraform-aws-static-website.git?ref=v1.0.0"
+    source  = "git@github.com:aashari/terraform-aws-static-website.git?ref=v1.1.0"
     name    = "andi.xyz"
     
     is_include_codebuild = true
