@@ -4,7 +4,7 @@ resource "cloudflare_record" "validation_record_acm_certificate_assets" {
     aws_acm_certificate.assets
   ]
 
-  count   = var.domain_vendor == "cloudflare" && length(aws_acm_certificate.assets) == 1 ? length(var.domain_names) : 0
+  count   = var.domain_vendor == "cloudflare" && length(var.domain_names) != 0 ? length(var.domain_names) : 0
   zone_id = var.cloudflare_zone_id
 
   name  = aws_acm_certificate.assets[0].domain_validation_options[count.index].resource_record_name
