@@ -12,6 +12,7 @@ This Terraform module will create below resources:
 * Cloudfront to serve your website/assets with CDN concept
 * [optional] ACM certificate if you have a custom domain
 * [optional] Cloudflare DNS records if you have a custom domain
+* [optional] AWS CodeBuild if you enable Github integration
 
 > Notes!
 > For custom domain, it will automatically create ACM certificate, and the certificate validation will validate by using DNS validation and this module will automatically validating the domain for you, so, all you need is only to provide the cloudflare api key and email
@@ -81,7 +82,7 @@ This Terraform module will create below resources:
 
 ```
 module "website" {
-    source    = "git@github.com:aashari/terraform-aws-static-website.git?ref=v1.0.0"
+    source    = "git@github.com:aashari/terraform-aws-static-website.git?ref=v1.1.0"
     name      = "andi.xyz"
 }
 ```
@@ -90,7 +91,7 @@ module "website" {
 
 ```
 module "website" {
-    source        = "git@github.com:aashari/terraform-aws-static-website.git?ref=v1.0.0"
+    source        = "git@github.com:aashari/terraform-aws-static-website.git?ref=v1.1.0"
     name          = "andi.xyz"
     domain_names  = ["andi.fyi", "www.andi.fyi"]
 
