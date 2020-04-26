@@ -9,6 +9,30 @@ variable "is_versioning_enabled" {
   description = "Toggle to enable or disable S3 bucket versioning"
 }
 
+variable "is_include_codebuild" {
+  type        = bool
+  default     = false
+  description = "Toggle to enable or disable codebuild integration to github"
+}
+
+variable "github_token" {
+  type        = string
+  default     = ""
+  description = "Github token that have get repo permission and manage webhook permission"
+}
+
+variable "github_name" {
+  type        = string
+  default     = ""
+  description = "Github name that store source code of website/application format \"{username}/{reponame}\""
+}
+
+variable "github_branch" {
+  type        = string
+  default     = "master"
+  description = "Github branch to be deployed"
+}
+
 variable "domain_names" {
   type        = list(string)
   default     = []
@@ -34,4 +58,9 @@ variable "cloudflare_email" {
 variable "cloudflare_zone_id" {
   type    = string
   default = ""
+}
+
+variable "artifact_bucket" {
+  type    = string
+  default = "-"
 }
