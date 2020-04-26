@@ -53,6 +53,22 @@ This Terraform module will create below resources:
     
     Cloudflare zone id for `domain_names`, you can get this from zone setting
     
+* **is_include_codebuild** [string; optional]:
+    
+    Toggle to enable or disable Github integration with AWS CodeBuild
+    
+* **github_token** [string; required if `is_include_codebuild` are set to `true`]:
+    
+    Github token that have get repo permission and manage webhook permission
+    
+* **github_name** [string; required if `is_include_codebuild` are set to `true`]:
+    
+    Github name that store source code of website/application format "{username}/{reponame}"
+    
+* **github_branch** [string; required if `is_include_codebuild` are set to `true`]:
+    
+    Github branch to be deployed
+    
 
 ## Output Variables
 
@@ -65,8 +81,8 @@ This Terraform module will create below resources:
 
 ```
 module "website" {
-  source              = "git@github.com:aashari/terraform-aws-static-website.git?ref=v1.0.0"
-  name								= "andi.xyz"
+    source    = "git@github.com:aashari/terraform-aws-static-website.git?ref=v1.0.0"
+    name      = "andi.xyz"
 }
 ```
 
@@ -74,15 +90,29 @@ module "website" {
 
 ```
 module "website" {
-  source              = "git@github.com:aashari/terraform-aws-static-website.git?ref=v1.0.0"
-  name								= "andi.xyz"
-  domain_names 				= ["andi.fyi", "www.andi.fyi"]
+    source        = "git@github.com:aashari/terraform-aws-static-website.git?ref=v1.0.0"
+    name          = "andi.xyz"
+    domain_names  = ["andi.fyi", "www.andi.fyi"]
 
-	domain_vendor = "cloudflare"
+    domain_vendor = "cloudflare"
+    
+    cloudflare_email   = "my-email@andi.xyz"
+    cloudflare_api_key = "abcdefghijklmnopqrstuvwxyz123456"
+    cloudflare_zone_id = "abcdefghijklmnopqrstuvwxyz123456"
+}
+```
 
-	cloudflare_email   = "my-email@andi.xyz"
-	cloudflare_api_key = "abcdefghijklmnopqrstuvwxyz123456"
-	cloudflare_zone_id = "abcdefghijklmnopqrstuvwxyz123456"
+### With AWS CodeBuild enabled
+
+```
+module "website" {
+    source  = "git@github.com:aashari/terraform-aws-static-website.git?ref=v1.0.0"
+    name    = "andi.xyz"
+    
+    is_include_codebuild = true
+    github_token         = "abcdefghijklmnopqrstuvwxyz"
+    github_name          = "aashari/aashari-web"
+    github_branch        = "master"
 }
 ```
 
