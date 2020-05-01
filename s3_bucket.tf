@@ -9,4 +9,6 @@ resource "aws_s3_bucket" "assets" {
   versioning {
     enabled = var.is_versioning_enabled
   }
+
+  tags = var.resource_tags
 }

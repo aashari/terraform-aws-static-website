@@ -63,6 +63,8 @@ resource "aws_cloudfront_distribution" "server" {
     ssl_support_method             = length(aws_acm_certificate.assets) == 0 ? "" : "sni-only"
   }
 
+  tags = var.resource_tags
+
 }
 
 resource "aws_s3_bucket_policy" "assets" {

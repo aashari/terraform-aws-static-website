@@ -11,4 +11,6 @@ resource "aws_acm_certificate" "assets" {
     create_before_destroy = true
   }
 
+  tags = var.resource_tags
+
 }

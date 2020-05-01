@@ -15,6 +15,19 @@ variable "is_include_codebuild" {
   description = "Toggle to enable or disable codebuild integration to github"
 }
 
+variable "resource_tags" {
+  default = null
+}
+
+variable "codebuild_environment_variables" {
+  type = list(object({
+    name  = string
+    value = string
+  }))
+  default     = []
+  description = ""
+}
+
 variable "github_token" {
   type        = string
   default     = ""

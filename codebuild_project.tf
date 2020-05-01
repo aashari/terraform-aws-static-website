@@ -26,6 +26,7 @@ resource "aws_iam_role" "assets" {
       ]
     }
   )
+  tags = var.resource_tags
 }
 
 resource "aws_iam_role_policy" "aws_iam_role_assets_default_policy" {
@@ -127,11 +128,6 @@ resource "aws_codebuild_project" "assets" {
     image_pull_credentials_type = "CODEBUILD"
 
     environment_variable {
-      name  = "ARTIFACT_BUCKET"
-      value = var.artifact_bucket
-    }
-
-    environment_variable {
       name  = "BUCKET_NAME"
       value = aws_s3_bucket.assets.bucket
     }
@@ -140,6 +136,15 @@ resource "aws_codebuild_project" "assets" {
       name  = "DISTRIBUTION_ID"
       value = aws_cloudfront_distribution.server.id
     }
+
+    dynamic "environment_variable" {
+      for_each = var.codebuild_environment_variables
+      content {
+        name  = environment_variable.value.name
+        value = environment_variable.value.value
+      }
+    }
+
   }
 
   logs_config {
@@ -160,6 +165,7 @@ resource "aws_codebuild_project" "assets" {
   }
 
   source_version = var.github_branch
+  tags           = var.resource_tags
 
 }
 
