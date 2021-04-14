@@ -94,13 +94,12 @@ resource "aws_iam_role_policy" "aws_iam_role_assets_s3_policy" {
           Action : [
             "s3:PutObject",
             "s3:GetObject",
-            "s3:ListBucket"
+            "s3:ListBucket",
+            "s3:ListObjectsV2"
           ],
           Resource : [
-            "arn:aws:s3:::aksacreative.com-cms-${data.aws_region.current.name}-${data.aws_caller_identity.current.account_id}-gk525453rs",
-            "arn:aws:s3:::aksacreative.com-cms-${data.aws_region.current.name}-${data.aws_caller_identity.current.account_id}-gk525453rs/*",
-            "arn:aws:s3:::mq-central-instance-artifact-${data.aws_region.current.name}-${data.aws_caller_identity.current.account_id}",
-            "arn:aws:s3:::mq-central-instance-artifact-${data.aws_region.current.name}-${data.aws_caller_identity.current.account_id}/*"
+            aws_s3_bucket.assets.arn,
+            "${aws_s3_bucket.assets.arn}/*",
           ]
         }
       ]
@@ -149,8 +148,6 @@ resource "aws_codebuild_project" "assets" {
 
   logs_config {
     cloudwatch_logs {
-      group_name  = "log-group"
-      stream_name = "log-stream"
     }
   }
 

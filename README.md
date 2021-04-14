@@ -15,7 +15,7 @@ This Terraform module will create below resources:
 * [optional] AWS CodeBuild if you enable Github integration
 
 > Notes!
-> For custom domain, it will automatically create ACM certificate, and the certificate validation will validate by using DNS validation and this module will automatically validating the domain for you, so, all you need is only to provide the cloudflare api key and email
+> For custom domain, it will automatically create ACM certificate, and the certificate validation will validate by using DNS validation and this module will automatically validating the domain for you, so, all you need is only to provide the cloudflare api key
 
 ## Dependencies
 
@@ -45,10 +45,6 @@ This Terraform module will create below resources:
 * **cloudflare_api_key** [string; required if `domain_vendor` are set to `cloudflare`]:
     
     Cloudflare API key, you can get this from your Cloudflare account setting
-    
-* **cloudflare_email** [string; required if `domain_vendor` are set to `cloudflare`]:
-    
-    Cloudflare Email, you can get this from your Cloudflare account setting
     
 * **cloudflare_zone_id** [string; required if `domain_vendor` are set to `cloudflare`]:
     
@@ -97,7 +93,6 @@ module "website" {
 
     domain_vendor = "cloudflare"
     
-    cloudflare_email   = "my-email@andi.xyz"
     cloudflare_api_key = "abcdefghijklmnopqrstuvwxyz123456"
     cloudflare_zone_id = "abcdefghijklmnopqrstuvwxyz123456"
 }
@@ -115,6 +110,19 @@ module "website" {
     github_name          = "aashari/aashari-web"
     github_branch        = "master"
 }
+```
+
+### Codebuild buildspec.yaml
+```
+version: 0.2
+phases:
+  build:
+    commands:
+      - echo "${aws s3 sync ./build S3://$BUCKET_NAME}"
+  post_build:
+    commands:
+      - echo "${aws cloudfront create-invalidation --distribution-id $DISTRIBUTION_ID}"
+
 ```
 
 ## Contribute

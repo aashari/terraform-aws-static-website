@@ -53,8 +53,15 @@ variable "domain_names" {
 }
 
 variable "domain_vendor" {
-  type    = string
-  default = "The name of your DNS vendor, the choice: cloudfront"
+  type        = string
+  default     = ""
+  description = "The name of your DNS vendor, the choice: cloudfront"
+}
+
+variable "cloudwatch_logs_retention" {
+  type        = number
+  default     = 7
+  description = "The number of days to retain the logs for cloudwatch logs"
 }
 
 variable "cloudflare_api_key" {
@@ -63,14 +70,21 @@ variable "cloudflare_api_key" {
   description = "Cloudflare API key"
 }
 
-variable "cloudflare_email" {
-  type    = string
-  default = "Cloudflare Email address"
-}
-
 variable "cloudflare_zone_id" {
   type    = string
   default = ""
+}
+
+variable "cloudflare_ttl" {
+  type        = number
+  default     = 1
+  description = "The TTL for the records, set to 1 for automatic"
+}
+
+variable "cloudflare_proxied" {
+  type        = string
+  default     = false
+  description = "The proxy status for the records, the default value is false"
 }
 
 variable "artifact_bucket" {
