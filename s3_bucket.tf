@@ -3,7 +3,7 @@ resource "random_id" "aws_s3_bucket_assets" {
 }
 
 resource "aws_s3_bucket" "assets" {
-  bucket = "${var.name}-assets-${data.aws_caller_identity.current.account_id}-${random_id.aws_s3_bucket_assets.hex}"
+  bucket = format("%s-assets-%s-%s", var.name, data.aws_caller_identity.current.account_id, random_id.aws_s3_bucket_assets.hex)
   acl    = "private"
 
   versioning {

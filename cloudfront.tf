@@ -79,7 +79,7 @@ resource "aws_s3_bucket_policy" "assets" {
           Principal = {
             AWS = aws_cloudfront_origin_access_identity.origin_access_identity.iam_arn
           }
-          Resource = "${aws_s3_bucket.assets.arn}/*"
+          Resource = format("%s/*", aws_s3_bucket.assets.arn)
           Sid      = "cloudfront_get_object"
         },
         {

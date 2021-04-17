@@ -6,12 +6,8 @@ resource "random_id" "aws_codebuild_project_assets" {
   byte_length = 4
 }
 
-locals {
-  codebuild_name = "${replace(var.name, ".", "-")}-builder-${random_id.aws_iam_role_assets.hex}"
-}
-
 resource "aws_iam_role" "assets" {
-  name = "codebuild-${local.codebuild_name}"
+  name = format("codebuild-%s", local.codebuild_name)
   assume_role_policy = jsonencode(
     {
       "Version" : "2012-10-17",
@@ -39,8 +35,8 @@ resource "aws_iam_role_policy" "aws_iam_role_assets_default_policy" {
         {
           Effect : "Allow",
           Resource : [
-            "arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:/aws/codebuild/${local.codebuild_name}",
-            "arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:/aws/codebuild/${local.codebuild_name}:*"
+            format("arn:aws:logs:%s:%s:log-group:/aws/codebuild/%s", data.aws_region.current.name, data.aws_caller_identity.current.account_id, local.codebuild_name),
+            format("arn:aws:logs:%s:%s:log-group:/aws/codebuild/%s:*", data.aws_region.current.name, data.aws_caller_identity.current.account_id, local.codebuild_name),
           ],
           Action : [
             "logs:CreateLogGroup",
@@ -57,7 +53,7 @@ resource "aws_iam_role_policy" "aws_iam_role_assets_default_policy" {
             "codebuild:BatchPutTestCases"
           ],
           Resource : [
-            "arn:aws:codebuild:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:report-group/${local.codebuild_name}-*"
+            format("arn:aws:codebuild:%s:%s:report-group/%s-*", data.aws_region.current.name, data.aws_caller_identity.current.account_id, local.codebuild_name)
           ]
         }
       ]
@@ -99,7 +95,7 @@ resource "aws_iam_role_policy" "aws_iam_role_assets_s3_policy" {
           ],
           Resource : [
             aws_s3_bucket.assets.arn,
-            "${aws_s3_bucket.assets.arn}/*",
+            format("%s/*", aws_s3_bucket.assets.arn)
           ]
         }
       ]
@@ -154,7 +150,7 @@ resource "aws_codebuild_project" "assets" {
   source {
     type            = "GITHUB"
     git_clone_depth = 1
-    location        = "https://github.com/${var.github_name}"
+    location        = format("https://github.com/%s", var.github_name)
     auth {
       type     = "OAUTH"
       resource = aws_codebuild_source_credential.github[0].arn
