@@ -26,47 +26,18 @@ This Terraform module will create below resources:
 
 ## Input Variables
 
-* **name** [string; required]: 
-
-    The name of your website/assets, e.g. `andi.xyz`, `aashari.id`, `mywebsite`, or  `andi-cms`
-   
-* **is_versioning_enabled** [boolean; optional; default: false]: 
-  
-    Toggle to enable or disable S3 bucket versioning
-    
-* **domain_names** [list(string); optional; default: []]: 
-  
-    The list of domain names associated to cloudfront, e.g. `["www.andi.xyz","andi.xyz"]`, or `["cms.andi.xyz"]`
-    
-* **domain_vendor** [string; required if `domain_names` is filled]: 
-  
-    The name of your DNS vendor, the choice: `cloudfront`
-    
-* **cloudflare_api_key** [string; required if `domain_vendor` are set to `cloudflare`]:
-    
-    Cloudflare API key, you can get this from your Cloudflare account setting
-    
-* **cloudflare_zone_id** [string; required if `domain_vendor` are set to `cloudflare`]:
-    
-    Cloudflare zone id for `domain_names`, you can get this from zone setting
-    
-* **is_include_codebuild** [string; optional]:
-    
-    Toggle to enable or disable Github integration with AWS CodeBuild
-    
-* **github_token** [string; required if `is_include_codebuild` are set to `true`]:
-    
-    Github token that have get repo permission and manage webhook permission
-    
-* **github_name** [string; required if `is_include_codebuild` are set to `true`]:
-    
-    Github name that store source code of website/application format "{username}/{reponame}"
-    
-* **github_branch** [string; required if `is_include_codebuild` are set to `true`]:
-    
-    Github branch to be deployed
-    
-
+| Variable Name         | Data Type    | Is Required                            | Default Value | Description                                                                                              |
+|-----------------------|--------------|----------------------------------------|---------------|----------------------------------------------------------------------------------------------------------|
+| name                  | string       | true                                   |               | The name of your website/assets, e.g. `andi.xyz`, `aashari.id`, `mywebsite`, or `andi-cms`               |
+| is_versioning_enabled | bool         | false                                  | false         | Toggle to enable or disable S3 bucket versioning                                                         |
+| domain_names          | list(string) | false                                  | []            | The list of domain names associated to cloudfront, e.g. ["www.andi.xyz","andi.xyz"], or ["cms.andi.xyz"] |
+| domain_vendor         | string       | true if `domain_names` != []           |               | The name of your DNS vendor, the choice: cloudflare                                                      |
+| cloudflare_api_key    | string       | true if `domain_vendor` = `cloudflare` |               | Cloudflare API key, you can get this from your Cloudflare account setting                                |
+| cloudflare_zone_id    | string       | true if `domain_vendor` = `cloudflare` |               | Cloudflare zone id for `domain_names`, you can get this from zone setting                                |
+| is_include_codebuild  | bool         | false                                  | false         | Toggle to enable or disable Github integration with AWS CodeBuild                                        |
+| github_token          | string       | true if `is_include_codebuild` = true  |               | Github token that have get repo permission and manage webhook permission                                 |
+| github_name           | string       | true if `is_include_codebuild` = true  |               | Github name that store source code of website/application format "{username}/{reponame}"                 |
+| github_branch         | string       | true if `is_include_codebuild` = true  |               | Github branch to be deployed                                                                             |
 ## Output Variables
 
 * **s3_bucket**: The name of S3 Bucket created
