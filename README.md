@@ -26,9 +26,9 @@ This is a Terraform module to provision a static website using AWS S3 and CloudF
 | <a name="input_default_not_found_page"></a> [default_not_found_page](#input\_default\_not\_found\_page) | Default not found page | `string` | `index.html` | `false` |
 | <a name="input_default_tags"></a> [default_tags](#input\_default\_tags) | Default tags to apply to all resources | `map(string)` | `{}` | `false` |
 | <a name="input_custom_domain_provider"></a> [custom_domain_provider](#input\_custom\_domain\_provider) | Custom domain provider name | `ENUM("CLOUDFLARE")` |  | `false` |
-| <a name="input_custom_domain_records"></a> [custom_domain_records](#input\_custom\_domain\_records) | Custom domain records name to use for CloudFront distribution | `list(string)` | `[]` | `yes, if input_custom_domain_provider is filled` |
-| <a name="input_custom_domain_zone_id"></a> [custom_domain_zone_id](#input\_custom\_domain\_zone\_id) | Domain Provider zone ID which custom domain is registered to | `string` |  | `yes, if input_custom_domain_provider is filled` |
-| <a name="input_cloudflare_api_token"></a> [cloudflare_api_token](#input\_cloudflare\_api\_token) | CloudFlare API token | `string` |  | `yes, if input_custom_domain_provider=CLOUDFLARE` |
+| <a name="input_custom_domain_records"></a> [custom_domain_records](#input\_custom\_domain\_records) | Custom domain records name to use for CloudFront distribution | `list(string)` | `[]` | `yes, if custom_domain_provider is filled` |
+| <a name="input_custom_domain_zone_id"></a> [custom_domain_zone_id](#input\_custom\_domain\_zone\_id) | Domain Provider zone ID which custom domain is registered to | `string` |  | `yes, if custom_domain_provider is filled` |
+| <a name="input_cloudflare_api_token"></a> [cloudflare_api_token](#input\_cloudflare\_api\_token) | CloudFlare API token | `string` |  | `yes, if custom_domain_provider=CLOUDFLARE` |
 
 ## Usage
 
@@ -39,6 +39,7 @@ module "static-website" {
   name   = "test.ashari.me"
 }
 ```
+The code above will provide an S3 bucket and a Cloudfront Distribution serving static assets in an S3 bucket
 
 ### With Custom Domain Cloudflare
 ```
@@ -55,6 +56,7 @@ module "static-website" {
 
 }
 ```
+The code above will provide an S3 bucket and Cloudfront Distribution serving static assets in an S3 bucket with additional ACM certificates for the custom domains assigned to Cloudfront and creating new records in the Cloudflare Zone
 
 ## License
 Apache 2 Licensed. See [LICENSE](https://github.com/aashari/terraform-aws-static-website/tree/master/LICENSE) for full details.
