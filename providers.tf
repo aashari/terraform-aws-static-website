@@ -9,5 +9,18 @@ terraform {
       source  = "hashicorp/random"
       version = "~> 3.1.2"
     }
+    cloudflare = {
+      source  = "cloudflare/cloudflare"
+      version = "~> 3.0"
+    }
   }
+}
+
+provider "cloudflare" {
+  api_token = var.cloudflare_api_token == "" ? "AaaA11AaaaAaaA1aa11AAa11A76aaAAa9aAAaa-a" : var.cloudflare_api_token
+}
+
+provider "aws" {
+  alias  = "us-east-1"
+  region = "us-east-1"
 }
