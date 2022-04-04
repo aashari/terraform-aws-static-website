@@ -85,6 +85,7 @@ resource "aws_cloudfront_distribution" "this" {
   ]
 
   enabled             = true
+  comment             = replace(local.resource_name, "{}", "distribution")
   default_root_object = var.default_root_object
   aliases             = var.custom_domain_provider != "" ? [for record in var.custom_domain_records : replace("${record}.${var.custom_domain_provider == "CLOUDFLARE" ? data.cloudflare_zone.this[0].name : data.aws_route53_zone.this[0].name}", "@.", "")] : []
 
@@ -101,6 +102,15 @@ resource "aws_cloudfront_distribution" "this" {
     error_code            = 404
     response_code         = 200
     response_page_path    = "/${var.default_not_found_page}"
+  }
+
+  dynamic "logging_config" {
+    for_each = var.cloudfront_access_log_bucket != "" ? [{}] : []
+    content {
+      bucket          = data.aws_s3_bucket.access_log[0].bucket_domain_name
+      include_cookies = var.cloudfront_access_log_enable_cookies
+      prefix          = replace(local.resource_name, "{}", "distribution")
+    }
   }
 
   default_cache_behavior {

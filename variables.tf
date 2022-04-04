@@ -21,6 +21,18 @@ variable "default_not_found_page" {
   description = "Default not found page"
 }
 
+variable "cloudfront_access_log_bucket" {
+  type        = string
+  default     = ""
+  description = "Cloudfront access log bucket name"
+}
+
+variable "cloudfront_access_log_enable_cookies" {
+  type        = bool
+  default     = true
+  description = "Enable CloudFront access logs to include cookies"
+}
+
 variable "cloudfront_function_file_path" {
   type        = string
   default     = ""
