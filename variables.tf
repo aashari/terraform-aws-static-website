@@ -21,6 +21,24 @@ variable "default_not_found_page" {
   description = "Default not found page"
 }
 
+variable "cloudfront_function_file_path" {
+  type        = string
+  default     = ""
+  description = "Path to the CloudFront function file"
+}
+
+variable "cloudfront_function_runtime" {
+  type        = string
+  default     = "cloudfront-js-1.0"
+  description = "CloudFront function runtime"
+}
+
+variable "cloudfront_function_type" {
+  type        = string
+  default     = "viewer-request"
+  description = "CloudFront function event type to trigger"
+}
+
 variable "custom_domain_provider" {
   type        = string
   default     = ""

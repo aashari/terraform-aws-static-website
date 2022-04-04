@@ -16,16 +16,12 @@ The code above will provide an S3 bucket and a Cloudfront Distribution serving s
 ### With Custom Domain Cloudflare
 ```
 module "static-website" {
-  source = "git@github.com:aashari/terraform-aws-static-website.git"
-
-  name = "hello.ashari.me"
-
-  custom_domain_provider = "CLOUDFLARE"
-  custom_domain_records  = ["hello", "www.hello"]
-  custom_domain_zone_id  = "abcdefghijklmnopqrstuvwxyz12345"
-
-  cloudflare_api_token = "AaaA11AaaaAaaA1aa11AAa11A76aaAAa9aAAaa-a"
-
+  source                  = "git@github.com:aashari/terraform-aws-static-website.git"
+  name                    = "hello.ashari.me"
+  custom_domain_provider  = "CLOUDFLARE"
+  custom_domain_records   = ["hello", "www.hello"]
+  custom_domain_zone_id   = "abcdefghijklmnopqrstuvwxyz12345"
+  cloudflare_api_token    = "AaaA11AaaaAaaA1aa11AAa11A76aaAAa9aAAaa-a"
 }
 ```
 The code above will provide an S3 bucket and Cloudfront Distribution serving static assets in an S3 bucket with additional ACM certificates for the custom domains assigned to Cloudfront and creating new records in the Cloudflare Zone
@@ -33,16 +29,29 @@ The code above will provide an S3 bucket and Cloudfront Distribution serving sta
 ### With Custom Domain Route53
 ```
 module "static-website" {
-  source = "git@github.com:aashari/terraform-aws-static-website.git"
-
-  name = "hello.ashari.me"
-
-  custom_domain_provider = "ROUTE53"
-  custom_domain_records  = ["hello", "www.hello"]
-  custom_domain_zone_id  = "Z0ABCDEFGHI1234567"
+  source                  = "git@github.com:aashari/terraform-aws-static-website.git"
+  name                    = "hello.ashari.me"
+  custom_domain_provider  = "ROUTE53"
+  custom_domain_records   = ["hello", "www.hello"]
+  custom_domain_zone_id   = "Z0ABCDEFGHI1234567"
 }
 ```
 The code above will provide an S3 bucket and Cloudfront Distribution serving static assets in an S3 bucket with additional ACM certificates for the custom domains assigned to Cloudfront and creating new records in the Route53 Zone
+
+### With CloudFront Function
+
+#### main.tf
+```
+module "static-website" {
+  source                        = "git@github.com:aashari/terraform-aws-static-website.git"
+  name                          = "ashari.tech"
+  cloudfront_function_file_path = "function.js"
+  cloudfront_function_runtime   = "cloudfront-js-1.0"
+  cloudfront_function_type      = "viewer-request"
+}
+
+```
+The code above will provide an S3 bucket and a Cloudfront Distribution serving static assets in an S3 bucket with additional CloudFront function ([function.js](examples/with-cloudfront-function/function.js)) which redirect www request to non-www request
 
 ## Requirements
 
@@ -67,6 +76,9 @@ The code above will provide an S3 bucket and Cloudfront Distribution serving sta
 | <a name="input_default_tags"></a> [default\_tags](#input\_default\_tags) | Default tags to apply to all resources | `map(string)` | `{}` | no |
 | <a name="input_default_root_object"></a> [default\_root\_object](#input\_default\_root\_object) | Default root object to serve | `string` | `index.html` | no |
 | <a name="input_default_not_found_page"></a> [default\_not\_found\_page](#input\_default\_not\_found\_page) | Default not found page | `string` | `index.html` | no |
+| <a name="input_cloudfront_function_file_path"></a> [input\_cloudfront\_function\_file\_path](#input\_input\_cloudfront\_function\_file\_path) | Path to the CloudFront function file | `string` | `` | no |
+| <a name="input_cloudfront_function_runtime"></a> [input\_cloudfront\_function\_runtime](#input\_input\_cloudfront\_function\_runtime) | CloudFront function runtime | `string` | `cloudfront-js-1.0` | no |
+| <a name="input_cloudfront_function_type"></a> [input\_cloudfront\_function\_type](#input\_input\_cloudfront\_function\_type) | CloudFront function event type to trigger | `string` | `viewer-request` | no |
 | <a name="input_custom_domain_provider"></a> [custom\_domain\_provider](#input\_custom\_domain\_provider) | Custom domain provider name. <br />Available values: `CLOUDFLARE`, `ROUTE53` | `string` | `""` | no |
 | <a name="input_custom_domain_records"></a> [custom\_domain\_records](#input\_custom\_domain\_records) | Custom domain records name to use for CloudFront distribution, use `@` to use the zone domain name.<br />For example `["hello", "www.hello"]` which represent `hello.{{ROOT_DOMAIN}}` and `www.hello.{{ROOT_DOMAIN}}`<br />or `["@", "www"]` which represent `{{ROOT_DOMAIN}}` and `www.{{ROOT_DOMAIN}}`.<br />where `ROOT_DOMAIN` is coming from domain name from Zone provided in `custom_domain_zone_id` variable  | `list(string)` | `[]` | yes if <a name="input_custom_domain_provider"></a> [custom\_domain\_provider](#input\_custom\_domain\_provider) is not empty  |
 | <a name="input_custom_domain_zone_id"></a> [custom\_domain\_zone\_id](#input\_custom\_domain\_zone\_id) | Domain Provider zone ID which custom domain is registered to.<br />In Cloudflare this is called Zone Id, in Route53 this is called Hosted Zone Id  | `string` | `""` | yes if <a name="input_custom_domain_provider"></a> [custom\_domain\_provider](#input\_custom\_domain\_provider) is not empty  |

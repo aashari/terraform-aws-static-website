@@ -117,6 +117,14 @@ resource "aws_cloudfront_distribution" "this" {
       cookies { forward = "all" }
     }
 
+    dynamic "function_association" {
+      for_each = var.cloudfront_function_file_path != "" ? [{}] : []
+      content {
+        event_type   = var.cloudfront_function_type
+        function_arn = aws_cloudfront_function.this.arn
+      }
+    }
+
   }
 
   restrictions {
@@ -182,3 +190,22 @@ resource "aws_route53_record" "this" {
 
 }
 # END: Custom Domain using ROUTE53
+
+# START: CloudFront function implementation
+resource "aws_cloudfront_function" "this" {
+  name    = replace(local.resource_name, "{}", "function")
+  runtime = var.cloudfront_function_runtime
+  comment = replace(local.resource_name, "{}", "function")
+  publish = var.cloudfront_function_file_path != "" ? true : false
+
+  code = var.cloudfront_function_file_path != "" ? file(var.cloudfront_function_file_path) : <<-EOT
+    function handler(event) {
+        return event;
+    }
+  EOT
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+# END: CloudFront function implementation
