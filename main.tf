@@ -54,12 +54,12 @@ resource "aws_s3_bucket_policy" "assets" {
 # START: Custom Domain
 resource "aws_acm_certificate" "this" {
 
-  count    = var.custom_domain_provider == "CLOUDFLARE" ? 1 : 0
+  count    = var.custom_domain_provider != "" ? 1 : 0
   provider = aws.us-east-1
 
-  domain_name = "${var.custom_domain_records[0]}.${data.cloudflare_zone.this[0].name}"
+  domain_name = "${var.custom_domain_records[0]}.${var.custom_domain_provider == "CLOUDFLARE" ? data.cloudflare_zone.this[0].name : data.aws_route53_zone.this[0].name}"
   subject_alternative_names = [
-    for record in var.custom_domain_records : "${record}.${data.cloudflare_zone.this[0].name}"
+    for record in var.custom_domain_records : "${record}.${var.custom_domain_provider == "CLOUDFLARE" ? data.cloudflare_zone.this[0].name : data.aws_route53_zone.this[0].name}"
     if record != var.custom_domain_records[0]
   ]
   validation_method = "DNS"
@@ -71,17 +71,8 @@ resource "aws_acm_certificate" "this" {
 
 }
 
-resource "cloudflare_record" "acm" {
-  count   = var.custom_domain_provider == "CLOUDFLARE" ? length(var.custom_domain_records) : 0
-  zone_id = data.cloudflare_zone.this[0].id
-  name    = tolist(aws_acm_certificate.this[0].domain_validation_options)[count.index].resource_record_name
-  value   = trim(tolist(aws_acm_certificate.this[0].domain_validation_options)[count.index].resource_record_value, ".")
-  type    = tolist(aws_acm_certificate.this[0].domain_validation_options)[count.index].resource_record_type
-  proxied = false
-}
-
 resource "aws_acm_certificate_validation" "this" {
-  count           = var.custom_domain_provider == "CLOUDFLARE" ? 1 : 0
+  count           = var.custom_domain_provider != "" ? 1 : 0
   provider        = aws.us-east-1
   certificate_arn = aws_acm_certificate.this[0].arn
 }
@@ -95,7 +86,7 @@ resource "aws_cloudfront_distribution" "this" {
 
   enabled             = true
   default_root_object = var.default_root_object
-  aliases             = var.custom_domain_provider == "CLOUDFLARE" ? [for record in var.custom_domain_records : "${record}.${data.cloudflare_zone.this[0].name}"] : []
+  aliases             = var.custom_domain_provider != "" ? [for record in var.custom_domain_records : "${record}.${var.custom_domain_provider == "CLOUDFLARE" ? data.cloudflare_zone.this[0].name : data.aws_route53_zone.this[0].name}"] : []
 
   origin {
     domain_name = aws_s3_bucket.this.bucket_regional_domain_name
@@ -133,10 +124,10 @@ resource "aws_cloudfront_distribution" "this" {
   }
 
   viewer_certificate {
-    cloudfront_default_certificate = var.custom_domain_provider == "CLOUDFLARE" ? false : true
-    acm_certificate_arn            = var.custom_domain_provider == "CLOUDFLARE" ? aws_acm_certificate.this[0].arn : null
-    minimum_protocol_version       = var.custom_domain_provider == "CLOUDFLARE" ? "TLSv1.2_2021" : null
-    ssl_support_method             = var.custom_domain_provider == "CLOUDFLARE" ? "sni-only" : null
+    cloudfront_default_certificate = var.custom_domain_provider != "" ? false : true
+    acm_certificate_arn            = var.custom_domain_provider != "" ? aws_acm_certificate.this[0].arn : null
+    minimum_protocol_version       = var.custom_domain_provider != "" ? "TLSv1.2_2021" : null
+    ssl_support_method             = var.custom_domain_provider != "" ? "sni-only" : null
   }
 
   tags = local.default_tags
@@ -144,12 +135,45 @@ resource "aws_cloudfront_distribution" "this" {
 }
 
 # START: Custom Domain using CLOUDFLARE
+resource "cloudflare_record" "acm" {
+  depends_on = [aws_acm_certificate.this]
+  count      = var.custom_domain_provider == "CLOUDFLARE" ? length(var.custom_domain_records) : 0
+  zone_id    = data.cloudflare_zone.this[0].id
+  name       = tolist(aws_acm_certificate.this[0].domain_validation_options)[count.index].resource_record_name
+  value      = trim(tolist(aws_acm_certificate.this[0].domain_validation_options)[count.index].resource_record_value, ".")
+  type       = tolist(aws_acm_certificate.this[0].domain_validation_options)[count.index].resource_record_type
+  ttl        = var.custom_domain_ttl
+  proxied    = false
+}
+
 resource "cloudflare_record" "this" {
   count   = var.custom_domain_provider == "CLOUDFLARE" ? length(var.custom_domain_records) : 0
   zone_id = data.cloudflare_zone.this[0].id
   name    = var.custom_domain_records[count.index]
   value   = aws_cloudfront_distribution.this.domain_name
   type    = "CNAME"
+  ttl     = var.custom_domain_ttl
   proxied = false
 }
 # END: Custom Domain using CLOUDFLARE
+
+# START: Custom Domain using ROUTE53
+resource "aws_route53_record" "acm" {
+  depends_on = [aws_acm_certificate.this]
+  count      = var.custom_domain_provider == "ROUTE53" ? length(var.custom_domain_records) : 0
+  zone_id    = data.aws_route53_zone.this[0].id
+  name       = tolist(aws_acm_certificate.this[0].domain_validation_options)[count.index].resource_record_name
+  records    = [trim(tolist(aws_acm_certificate.this[0].domain_validation_options)[count.index].resource_record_value, ".")]
+  type       = tolist(aws_acm_certificate.this[0].domain_validation_options)[count.index].resource_record_type
+  ttl        = var.custom_domain_ttl
+}
+
+resource "aws_route53_record" "this" {
+  count   = var.custom_domain_provider == "ROUTE53" ? length(var.custom_domain_records) : 0
+  zone_id = data.aws_route53_zone.this[0].zone_id
+  name    = var.custom_domain_records[count.index]
+  type    = "CNAME"
+  ttl     = var.custom_domain_ttl
+  records = [aws_cloudfront_distribution.this.domain_name]
+}
+# END: Custom Domain using ROUTE53

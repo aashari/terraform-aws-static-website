@@ -5,8 +5,8 @@ module "static-website" {
 
   custom_domain_provider = "CLOUDFLARE"
   custom_domain_records  = ["hello", "www.hello"]
-  custom_domain_zone_id  = "abcdefghijklmnopqrstuvwxyz12345"
+  custom_domain_zone_id  = var.custom_domain_zone_id
 
-  cloudflare_api_token = "AaaA11AaaaAaaA1aa11AAa11A76aaAAa9aAAaa-a"
+  cloudflare_api_token      = var.cloudflare_api_token
 
 }

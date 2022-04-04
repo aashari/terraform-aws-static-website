@@ -39,6 +39,12 @@ variable "custom_domain_zone_id" {
   description = "Domain Provider zone ID which custom domain is registered to"
 }
 
+variable "custom_domain_ttl" {
+  type        = number
+  default     = 300
+  description = "Custom domain TTL"
+}
+
 variable "cloudflare_api_token" {
   type        = string
   default     = ""

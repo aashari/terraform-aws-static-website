@@ -7,3 +7,10 @@ data "cloudflare_zone" "this" {
   zone_id = var.custom_domain_zone_id
 }
 # END: Custom Domain using CLOUDFLARE
+
+# START: Custom Domain using ROUTE53
+data "aws_route53_zone" "this" {
+  count   = var.custom_domain_provider == "ROUTE53" ? 1 : 0
+  zone_id = var.custom_domain_zone_id
+}
+# END: Custom Domain using ROUTE53
