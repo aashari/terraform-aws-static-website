@@ -30,7 +30,7 @@ variable "custom_domain_provider" {
 variable "custom_domain_records" {
   type        = list(string)
   default     = []
-  description = "Custom domain records name to use for CloudFront distribution"
+  description = "Custom domain records name to use for CloudFront distribution, use `@` to use the zone domain name"
 }
 
 variable "custom_domain_zone_id" {

@@ -57,9 +57,9 @@ resource "aws_acm_certificate" "this" {
   count    = var.custom_domain_provider != "" ? 1 : 0
   provider = aws.us-east-1
 
-  domain_name = "${var.custom_domain_records[0]}.${var.custom_domain_provider == "CLOUDFLARE" ? data.cloudflare_zone.this[0].name : data.aws_route53_zone.this[0].name}"
+  domain_name = replace("${var.custom_domain_records[0]}.${var.custom_domain_provider == "CLOUDFLARE" ? data.cloudflare_zone.this[0].name : data.aws_route53_zone.this[0].name}", "@.", "")
   subject_alternative_names = [
-    for record in var.custom_domain_records : "${record}.${var.custom_domain_provider == "CLOUDFLARE" ? data.cloudflare_zone.this[0].name : data.aws_route53_zone.this[0].name}"
+    for record in var.custom_domain_records : replace("${record}.${var.custom_domain_provider == "CLOUDFLARE" ? data.cloudflare_zone.this[0].name : data.aws_route53_zone.this[0].name}", "@.", "")
     if record != var.custom_domain_records[0]
   ]
   validation_method = "DNS"
@@ -86,7 +86,7 @@ resource "aws_cloudfront_distribution" "this" {
 
   enabled             = true
   default_root_object = var.default_root_object
-  aliases             = var.custom_domain_provider != "" ? [for record in var.custom_domain_records : "${record}.${var.custom_domain_provider == "CLOUDFLARE" ? data.cloudflare_zone.this[0].name : data.aws_route53_zone.this[0].name}"] : []
+  aliases             = var.custom_domain_provider != "" ? [for record in var.custom_domain_records : replace("${record}.${var.custom_domain_provider == "CLOUDFLARE" ? data.cloudflare_zone.this[0].name : data.aws_route53_zone.this[0].name}", "@.", "")] : []
 
   origin {
     domain_name = aws_s3_bucket.this.bucket_regional_domain_name
@@ -171,9 +171,19 @@ resource "aws_route53_record" "acm" {
 resource "aws_route53_record" "this" {
   count   = var.custom_domain_provider == "ROUTE53" ? length(var.custom_domain_records) : 0
   zone_id = data.aws_route53_zone.this[0].zone_id
-  name    = var.custom_domain_records[count.index]
-  type    = "CNAME"
-  ttl     = var.custom_domain_ttl
-  records = [aws_cloudfront_distribution.this.domain_name]
+  name    = replace(var.custom_domain_records[count.index], "@", "")
+  type    = var.custom_domain_records[count.index] == "@" ? "A" : "CNAME"
+  ttl     = var.custom_domain_records[count.index] != "@" ? var.custom_domain_ttl : null
+  records = var.custom_domain_records[count.index] != "@" ? [aws_cloudfront_distribution.this.domain_name] : null
+
+  dynamic "alias" {
+    for_each = var.custom_domain_records[count.index] == "@" ? [""] : []
+    content {
+      evaluate_target_health = false
+      name                   = aws_cloudfront_distribution.this.domain_name
+      zone_id                = aws_cloudfront_distribution.this.hosted_zone_id
+    }
+  }
+
 }
 # END: Custom Domain using ROUTE53
