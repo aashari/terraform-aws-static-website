@@ -172,17 +172,12 @@ resource "aws_route53_record" "this" {
   count   = var.custom_domain_provider == "ROUTE53" ? length(var.custom_domain_records) : 0
   zone_id = data.aws_route53_zone.this[0].zone_id
   name    = replace(var.custom_domain_records[count.index], "@", "")
-  type    = var.custom_domain_records[count.index] == "@" ? "A" : "CNAME"
-  ttl     = var.custom_domain_records[count.index] != "@" ? var.custom_domain_ttl : null
-  records = var.custom_domain_records[count.index] != "@" ? [aws_cloudfront_distribution.this.domain_name] : null
+  type    = "A"
 
-  dynamic "alias" {
-    for_each = var.custom_domain_records[count.index] == "@" ? [""] : []
-    content {
-      evaluate_target_health = false
-      name                   = aws_cloudfront_distribution.this.domain_name
-      zone_id                = aws_cloudfront_distribution.this.hosted_zone_id
-    }
+  alias {
+    evaluate_target_health = false
+    name                   = aws_cloudfront_distribution.this.domain_name
+    zone_id                = aws_cloudfront_distribution.this.hosted_zone_id
   }
 
 }
