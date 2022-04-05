@@ -2,6 +2,8 @@
 
 This is a Terraform module to provision a static website using AWS S3 and CloudFront with optional custom domain ability
 
+![Overview Architecture Diagram](architecture-diagram.png)
+
 ## Usage
 
 ### Without Custom Domain
