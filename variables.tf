@@ -80,3 +80,9 @@ variable "cloudflare_api_token" {
   default     = ""
   description = "Cloudflare API token"
 }
+
+variable "enable_s3_versioning" {
+  type        = bool
+  default     = true
+  description = "Enable versioning on the S3 bucket"
+}

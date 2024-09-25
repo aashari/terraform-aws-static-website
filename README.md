@@ -1,6 +1,6 @@
 # AWS Static Website Terraform module
 
-This is a Terraform module to provision a static website using AWS S3 and CloudFront with optional custom domain ability
+This Terraform module provisions a static website using AWS S3 and CloudFront with optional custom domain support.
 
 ![Overview Architecture Diagram](architecture-diagram.png)
 
@@ -69,20 +69,30 @@ module "static-website" {
 ```
 The code above will provide an S3 bucket and a Cloudfront Distribution serving static assets in an S3 bucket with additional configuration on logging the access logs into the S3 bucket
 
+## Features
+
+- S3 bucket for static asset storage
+- CloudFront distribution for content delivery
+- Optional custom domain support (Cloudflare or Route53)
+- Optional CloudFront function
+- Optional CloudFront access logging
+
 ## Requirements
 
 | Name | Version |
 |------|---------|
-| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | ~> 1.1.7 |
-| <a name="requirement_aws"></a> [aws](#requirement\_aws) | ~> 4.8.0 |
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | ~> 1.9.6 |
+| <a name="requirement_aws"></a> [aws](#requirement\_aws) | ~> 5.68.0 |
+| <a name="requirement_random"></a> [random](#requirement\_random) | ~> 3.6.3 |
+| <a name="requirement_cloudflare"></a> [cloudflare](#requirement\_cloudflare) | ~> 4.0 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | ~> 4.8.0 |
-| <a name="provider_random"></a> [random](#provider\_random) | ~> 3.1.2 |
-| <a name="provider_cloudflare"></a> [cloudflare](#provider\_cloudflare) | ~> 3.0 |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | ~> 5.68.0 |
+| <a name="provider_random"></a> [random](#provider\_random) | ~> 3.6.3 |
+| <a name="provider_cloudflare"></a> [cloudflare](#provider\_cloudflare) | ~> 4.0 |
 
 ## Inputs
 
@@ -110,5 +120,10 @@ The code above will provide an S3 bucket and a Cloudfront Distribution serving s
 | <a name="output_s3_bucket_name"></a> [s3\_bucket\_name](#output\_s3\_bucket\_name) | S3 bucket name |
 | <a name="output_cloudfront_distribution_domain_name"></a> [cloudfront\_distribution\_domain\_name](#output\_cloudfront\_distribution\_domain\_name) | CloudFront distribution domain name |
 
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
 ## License
-Apache 2 Licensed. See [LICENSE](https://github.com/aashari/terraform-aws-static-website/tree/master/LICENSE) for full details.
+
+This project is licensed under the Apache 2.0 License - see the [LICENSE](LICENSE) file for details.

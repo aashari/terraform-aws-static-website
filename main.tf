@@ -12,7 +12,7 @@ locals {
 }
 
 resource "aws_s3_bucket" "this" {
-  bucket = "${replace(local.resource_name, "{}", "assets")}-${data.aws_region.current.id}-${data.aws_caller_identity.current.account_id}"
+  bucket = "${replace(local.resource_name, "{}", "assets")}-${data.aws_region.current.name}-${data.aws_caller_identity.current.account_id}"
   tags   = local.default_tags
 }
 
@@ -28,7 +28,7 @@ resource "aws_s3_bucket_public_access_block" "this" {
   restrict_public_buckets = true
 }
 
-resource "aws_s3_bucket_policy" "assets" {
+resource "aws_s3_bucket_policy" "this" {
   bucket = aws_s3_bucket.this.id
   policy = jsonencode({
     Version = "2008-10-17",
@@ -144,7 +144,7 @@ resource "aws_cloudfront_distribution" "this" {
   viewer_certificate {
     cloudfront_default_certificate = var.custom_domain_provider != "" ? false : true
     acm_certificate_arn            = var.custom_domain_provider != "" ? aws_acm_certificate.this[0].arn : null
-    minimum_protocol_version       = var.custom_domain_provider != "" ? "TLSv1.2_2021" : null
+    minimum_protocol_version       = var.custom_domain_provider != "" ? "TLSv1.2_2021" : "TLSv1.2_2019"
     ssl_support_method             = var.custom_domain_provider != "" ? "sni-only" : null
   }
 
@@ -158,7 +158,7 @@ resource "cloudflare_record" "acm" {
   count      = var.custom_domain_provider == "CLOUDFLARE" ? length(var.custom_domain_records) : 0
   zone_id    = data.cloudflare_zone.this[0].id
   name       = tolist(aws_acm_certificate.this[0].domain_validation_options)[count.index].resource_record_name
-  value      = trim(tolist(aws_acm_certificate.this[0].domain_validation_options)[count.index].resource_record_value, ".")
+  content    = trim(tolist(aws_acm_certificate.this[0].domain_validation_options)[count.index].resource_record_value, ".")
   type       = tolist(aws_acm_certificate.this[0].domain_validation_options)[count.index].resource_record_type
   ttl        = var.custom_domain_ttl
   proxied    = false
@@ -168,7 +168,7 @@ resource "cloudflare_record" "this" {
   count   = var.custom_domain_provider == "CLOUDFLARE" ? length(var.custom_domain_records) : 0
   zone_id = data.cloudflare_zone.this[0].id
   name    = var.custom_domain_records[count.index]
-  value   = aws_cloudfront_distribution.this.domain_name
+  content = aws_cloudfront_distribution.this.domain_name
   type    = "CNAME"
   ttl     = var.custom_domain_ttl
   proxied = false
@@ -218,4 +218,11 @@ resource "aws_cloudfront_function" "this" {
     create_before_destroy = true
   }
 }
-# END: CloudFront function implementation
+
+resource "aws_s3_bucket_versioning" "this" {
+  count  = var.enable_s3_versioning ? 1 : 0
+  bucket = aws_s3_bucket.this.id
+  versioning_configuration {
+    status = "Enabled"
+  }
+}
