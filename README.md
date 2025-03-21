@@ -1,17 +1,45 @@
 # AWS Static Website Terraform Module
 
-This Terraform module provisions a static website using AWS S3 and CloudFront with optional custom domain support.
+![Terraform](https://img.shields.io/badge/terraform-%235835CC.svg?style=for-the-badge&logo=terraform&logoColor=white)
+![AWS](https://img.shields.io/badge/AWS-%23FF9900.svg?style=for-the-badge&logo=amazon-aws&logoColor=white)
+![Version](https://img.shields.io/badge/version-4.0.0-blue.svg?style=for-the-badge)
 
-![Overview Architecture Diagram](architecture-diagram.png)
+A comprehensive Terraform module for provisioning static websites using AWS S3 and CloudFront with flexible configuration options.
+
+## Overview
+
+This module simplifies the deployment of static websites on AWS by providing a reusable Terraform configuration. It handles S3 bucket creation, CloudFront distribution setup, custom domain configuration, CloudFront functions, and access logging.
+
+![Overview Architecture Diagram](diagram.png)
 
 ## Features
 
-- S3 bucket for static asset storage
-- CloudFront distribution for content delivery
-- Optional custom domain support (Cloudflare or Route53)
-- Optional CloudFront function for request manipulation
-- Optional CloudFront access logging
-- S3 bucket versioning
+- **S3 bucket** for static asset storage
+- **CloudFront distribution** for content delivery
+- **Optional custom domain support** (Cloudflare or Route53)
+- **Optional CloudFront function** for request manipulation
+- **Optional CloudFront access logging**
+- **S3 bucket versioning**
+
+## Architecture
+
+The module creates and manages the following resources:
+
+- **S3 Bucket**: Private bucket for hosting static website files
+- **CloudFront Distribution**: CDN for delivering content with HTTPS
+- **CloudFront Origin Access Identity**: Secure access to the S3 bucket
+- **ACM Certificate**: (Optional) For custom domains
+- **DNS Records**: (Optional) For custom domain mapping via Cloudflare or Route53
+- **CloudFront Function**: (Optional) For request/response manipulation
+
+## Requirements
+
+| Name       | Version            |
+| ---------- | ------------------ |
+| terraform  | >= 1.11.1, < 2.0.0 |
+| aws        | >= 5.92.0, < 6.0.0 |
+| random     | >= 3.6.3, < 4.0.0  |
+| cloudflare | >= 5.20.0, < 6.0.0 |
 
 ## Usage
 
@@ -19,7 +47,7 @@ This Terraform module provisions a static website using AWS S3 and CloudFront wi
 
 ```hcl
 module "static_website" {
-  source = "github.com/aashari/terraform-aws-static-website"
+  source = "github.com/aashari/terraform-aws-static-website?ref=v4.0.0"
   name   = "my-static-website"
 }
 ```
@@ -28,7 +56,7 @@ module "static_website" {
 
 ```hcl
 module "static_website" {
-  source                 = "github.com/aashari/terraform-aws-static-website"
+  source                 = "github.com/aashari/terraform-aws-static-website?ref=v4.0.0"
   name                   = "my-static-website"
   custom_domain_provider = "CLOUDFLARE"
   custom_domain_records  = ["@", "www"]
@@ -41,7 +69,7 @@ module "static_website" {
 
 ```hcl
 module "static_website" {
-  source                 = "github.com/aashari/terraform-aws-static-website"
+  source                 = "github.com/aashari/terraform-aws-static-website?ref=v4.0.0"
   name                   = "my-static-website"
   custom_domain_provider = "ROUTE53"
   custom_domain_records  = ["@", "www"]
@@ -53,7 +81,7 @@ module "static_website" {
 
 ```hcl
 module "static_website" {
-  source                        = "github.com/aashari/terraform-aws-static-website"
+  source                        = "github.com/aashari/terraform-aws-static-website?ref=v4.0.0"
   name                          = "my-static-website"
   cloudfront_function_file_path = "path/to/function.js"
   cloudfront_function_runtime   = "cloudfront-js-1.0"
@@ -65,29 +93,12 @@ module "static_website" {
 
 ```hcl
 module "static_website" {
-  source                               = "github.com/aashari/terraform-aws-static-website"
+  source                               = "github.com/aashari/terraform-aws-static-website?ref=v4.0.0"
   name                                 = "my-static-website"
   cloudfront_access_log_bucket         = "my-access-logs-bucket"
   cloudfront_access_log_enable_cookies = true
 }
 ```
-
-## Requirements
-
-| Name       | Version   |
-| ---------- | --------- |
-| terraform  | ~> 1.9.6  |
-| aws        | ~> 5.68.0 |
-| random     | ~> 3.6.3  |
-| cloudflare | ~> 4.0    |
-
-## Providers
-
-| Name       | Version   |
-| ---------- | --------- |
-| aws        | ~> 5.68.0 |
-| random     | ~> 3.6.3  |
-| cloudflare | ~> 4.0    |
 
 ## Inputs
 
@@ -116,22 +127,6 @@ module "static_website" {
 | s3_bucket_name                      | S3 bucket name                      |
 | cloudfront_distribution_domain_name | CloudFront distribution domain name |
 
-## Examples
-
-For more detailed examples, please refer to the [examples](./examples) directory in this repository.
-
-## Contributing
-
-Contributions to this module are welcome! Please see the [contribution guidelines](CONTRIBUTING.md) for more information.
-
 ## License
 
-This module is licensed under the Apache 2.0 License. See the [LICENSE](LICENSE) file for full details.
-
-## Authors
-
-Module created and maintained by [Andi Ashari](https://github.com/aashari).
-
-## Support
-
-For support, please open an issue in the GitHub repository.
+This project is licensed under the MIT License - see the LICENSE file for details.
